@@ -39,5 +39,6 @@ def classify(prompt: str) -> tuple[str, str]:
     )
 
     raw = message.content[0].text.strip()
+    raw = raw.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
     data = json.loads(raw)
     return data["route"], data["reason"]

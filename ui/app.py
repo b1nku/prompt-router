@@ -42,7 +42,7 @@ class RouterApp(App):
             destination, reason, response = router.route(prompt)
 
             if destination == "claude":
-                label = "[bold orange]claude[/bold orange]"
+                label = "[bold red]claude[/bold red]"
             else:
                 label = "[bold cyan]ollama[/bold cyan]"
 
