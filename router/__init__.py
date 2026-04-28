@@ -2,16 +2,16 @@ from router.classifier import classify
 from router import claude_client, ollama_client
 
 
-def route(prompt: str) -> tuple[str, str, str]:
+def route(prompt: str) -> tuple[str, str, str, dict | float | None]:
     """
     Classify and respond to a prompt.
-    Returns (route, reason, response).
+    Returns (route, reason, response, energy_meta).
     """
     destination, reason = classify(prompt)
 
     if destination == "claude":
-        response = claude_client.ask(prompt)
+        response, energy_meta = claude_client.ask(prompt)
     else:
-        response = ollama_client.ask(prompt)
+        response, energy_meta = ollama_client.ask(prompt)
 
-    return destination, reason, response
+    return destination, reason, response, energy_meta

@@ -1,5 +1,6 @@
 import json
 import anthropic
+import re
 from router.config import ANTHROPIC_API_KEY, CLAUDE_CLASSIFIER_MODEL
 
 _client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
@@ -20,10 +21,11 @@ Route to "local" for:
 - Casual conversation or small talk
 - Basic definitions or quick lookups
 - Simple rephrasing or formatting
- 
+
 Respond ONLY with valid JSON. No markdown, no explanation, nothing else.
 Format: {"route": "claude", "reason": "one short sentence"}
-     or {"route": "local", "reason": "one short sentence"}"""
+     or {"route": "local", "reason": "one short sentence"}
+"""
 
 
 def classify(prompt: str) -> tuple[str, str]:
@@ -40,5 +42,9 @@ def classify(prompt: str) -> tuple[str, str]:
 
     raw = message.content[0].text.strip()
     raw = raw.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-    data = json.loads(raw)
+    match = re.search(r'\{.*?\}', raw, re.DOTALL)
+    if not match:
+        raise ValueError(f"No JSON found in classifier response: {repr(raw)}")
+    data = json.loads(match.group())
+
     return data["route"], data["reason"]
