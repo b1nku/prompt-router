@@ -1,3 +1,9 @@
+Project is done as a university project in Advanced Interaction Design.
+
+Opinion:
+We were tasked with creating tools using LLMs, which our team didn't feel comfortable with. There is an emphasis on campus with using LLMs for self-help and therapeutic purposes. We felt that there is not enough emphasis on the hidden costs of widespread use of AI : Significant and thoroughly obfuscated power draw. There has been a lot in the news about the environmental impacts of new data centers, and how RAM and GPU prices are very sensitive to widespread AI use. It is not in the AI companies' interests to let consumers be aware of the actual cost per prompt, as they are still in their customer-acquisition phase. Soon, when we are all dependent on AI for work, conversation, self-help & therapy etc. they will increase the prices and we will all get hit hard.
+/Opinion.
+
 # prompt-router
 
 A terminal-based prompt router that makes the hidden costs of AI use explicit. Prompts are classified by complexity and routed to either a cloud-based model (Claude) or a local model (Ollama). Each response is accompanied by a real or estimated energy figure - measured from the GPU for local inference, and derived from published research for cloud inference.
