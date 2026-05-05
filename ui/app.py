@@ -11,6 +11,10 @@ class RouterApp(App):
     """Prompt router TUI."""
 
     TITLE = "prompt-router"
+
+    def __init__(self, display_mode: str = "b") -> None:
+        super().__init__()
+        self.display_mode = display_mode
     BINDINGS = [
         Binding("ctrl+c", "quit", "Quit"),
     ]
@@ -61,6 +65,7 @@ class RouterApp(App):
             destination, reason, response, energy_meta = router.route(prompt)
 
             _CLOUD_HIGH_THRESHOLD_MWH = 2000
+            mode = self.display_mode
 
             if destination == "claude":
                 inf = energy_meta["inference_wh"] * 1000
@@ -68,17 +73,9 @@ class RouterApp(App):
                 tr_low = energy_meta["training_low"] * 1000
                 tr_high = energy_meta["training_high"] * 1000
                 tokens = energy_meta["tokens"]
-
-                if inf >= _CLOUD_HIGH_THRESHOLD_MWH:
-                    indicator = "🔥"
-                    colour = "red"
-                else:
-                    indicator = "⚡"
-                    colour = "yellow"
-
-                label = f"[bold {colour}]cloud-based agent {indicator}[/bold {colour}]"
-                summary = f"{label} [dim]— {escape(reason)} — [{colour}]{inf:.4f} mWh estimated[/{colour}][/dim]"
-                tooltip = (
+                indicator = "🔥" if inf >= _CLOUD_HIGH_THRESHOLD_MWH else "⚡"
+                colour = "red" if inf >= _CLOUD_HIGH_THRESHOLD_MWH else "yellow"
+                detail_tooltip = (
                     f"Inference:  {inf:.4f} mWh\n"
                     f"  {tokens} tokens × 1.54 Wh/1k × PUE 1.2\n"
                     f"\n"
@@ -89,9 +86,24 @@ class RouterApp(App):
                     f"All figures are estimates - Anthropic does not publish per-query energy data."
                 )
 
+                if mode == "a":
+                    label = "cloud-based agent"
+                    summary = f"{label} [dim]— {escape(reason)}[/dim]"
+                    tooltip = None
+                    border_colour = "grey"
+                elif mode == "b":
+                    label = f"[bold {colour}]cloud-based agent {indicator}[/bold {colour}]"
+                    summary = f"{label} [dim]— {escape(reason)} — [{colour}]{inf:.4f} mWh estimated[/{colour}] ⓘ[/dim]"
+                    tooltip = detail_tooltip
+                    border_colour = colour
+                else:  # c
+                    label = f"cloud-based agent {indicator}"
+                    summary = f"{label} [dim]— {escape(reason)} — {inf:.4f} mWh estimated ⓘ[/dim]"
+                    tooltip = detail_tooltip
+                    border_colour = "grey"
+
             else:
                 dur = energy_meta["duration_s"]
-                label = "[bold green]local agent 🌿[/bold green]"
 
                 if energy_meta["measured_wh"] is not None:
                     mwh = energy_meta["measured_wh"] * 1000
@@ -99,9 +111,7 @@ class RouterApp(App):
                     avg = energy_meta["avg_w"]
                     peak = energy_meta["peak_w"]
                     n = energy_meta["sample_count"]
-
-                    summary = f"{label} [dim]- {escape(reason)} - [green]{mwh:.4f} mWh marginal[/green][/dim]"
-                    tooltip = (
+                    detail_tooltip = (
                         f"Measured via GPU power sensor ({n} samples over {dur:.1f}s)\n"
                         f"\n"
                         f"Idle:   {idle:.1f} W\n"
@@ -110,22 +120,55 @@ class RouterApp(App):
                         f"\n"
                         f"Marginal: ({avg:.1f} - {idle:.1f}) W × {dur:.1f}s / 3600 = {mwh:.4f} mWh"
                     )
+
+                    if mode == "a":
+                        label = "local agent"
+                        summary = f"{label} [dim]— {escape(reason)}[/dim]"
+                        tooltip = None
+                        border_colour = "grey"
+                    elif mode == "b":
+                        label = "[bold green]local agent 🌿[/bold green]"
+                        summary = f"{label} [dim]— {escape(reason)} — [green]{mwh:.4f} mWh marginal[/green] ⓘ[/dim]"
+                        tooltip = detail_tooltip
+                        border_colour = "green"
+                    else:  # c
+                        label = "local agent 🌿"
+                        summary = f"{label} [dim]— {escape(reason)} — {mwh:.4f} mWh marginal ⓘ[/dim]"
+                        tooltip = detail_tooltip
+                        border_colour = "grey"
                 else:
-                    summary = f"{label} [dim]- {escape(reason)} - [green]power unavailable[/green][/dim]"
-                    tooltip = (
+                    detail_tooltip = (
                         f"No compatible power sensor found on this system.\n"
                         f"Duration: {dur:.1f}s"
                     )
 
+                    if mode == "a":
+                        label = "local agent"
+                        summary = f"{label} [dim]— {escape(reason)}[/dim]"
+                        tooltip = None
+                        border_colour = "grey"
+                    elif mode == "b":
+                        label = "[bold green]local agent 🌿[/bold green]"
+                        summary = f"{label} [dim]— {escape(reason)} — [green]power unavailable[/green] ⓘ[/dim]"
+                        tooltip = detail_tooltip
+                        border_colour = "green"
+                    else:  # c
+                        label = "local agent 🌿"
+                        summary = f"{label} [dim]— {escape(reason)} — power unavailable ⓘ[/dim]"
+                        tooltip = detail_tooltip
+                        border_colour = "grey"
+
             summary_widget = Static(summary, classes="entry")
-            summary_widget.tooltip = tooltip
+            if tooltip is not None:
+                summary_widget.tooltip = tooltip
+
+            response_widget = Static(escape(response), classes="entry")
+            if border_colour is not None:
+                response_widget.styles.border_left = ("tall", border_colour)
 
             self.call_from_thread(status.remove)
             self.call_from_thread(self._append, summary_widget)
-            self.call_from_thread(
-                self._append,
-                Static(escape(response), classes="entry"),
-            )
+            self.call_from_thread(self._append, response_widget)
 
         except Exception as e:
             self.call_from_thread(status.remove)
