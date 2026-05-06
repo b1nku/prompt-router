@@ -97,7 +97,7 @@ class RouterApp(App):
                     tooltip = detail_tooltip
                     border_colour = colour
                 else:  # c
-                    label = f"cloud-based agent {indicator}"
+                    label = f"cloud-based agent"
                     summary = f"{label} [dim]— {escape(reason)} — {inf:.4f} mWh estimated ⓘ[/dim]"
                     tooltip = detail_tooltip
                     border_colour = "grey"
@@ -132,7 +132,7 @@ class RouterApp(App):
                         tooltip = detail_tooltip
                         border_colour = "green"
                     else:  # c
-                        label = "local agent 🌿"
+                        label = "local agent"
                         summary = f"{label} [dim]— {escape(reason)} — {mwh:.4f} mWh marginal ⓘ[/dim]"
                         tooltip = detail_tooltip
                         border_colour = "grey"
@@ -153,7 +153,7 @@ class RouterApp(App):
                         tooltip = detail_tooltip
                         border_colour = "green"
                     else:  # c
-                        label = "local agent 🌿"
+                        label = "local agent"
                         summary = f"{label} [dim]— {escape(reason)} — power unavailable ⓘ[/dim]"
                         tooltip = detail_tooltip
                         border_colour = "grey"
