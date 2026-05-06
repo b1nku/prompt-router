@@ -96,11 +96,15 @@ OLLAMA_MODEL=llama3.2               # default
 ## usage
 
 ```bash
-prompt-router
+prompt-router --mode {'a', 'b', 'c'}
 ```
 
-Type a prompt and press Enter. Press `Ctrl+C` to quit.
+modes:
+- a: Clean, no nudging
+- b: Energy information, colour signal
+- c: Energy information, no colour signal
 
+Type a prompt and press Enter. Press `Ctrl+C` to quit.
 
 ## configuration
 
@@ -123,5 +127,7 @@ Classifier and response models are set in `router/config.py`:
 - [x] Cross-platform power sampling (Linux + Windows)
 - [x] Research-backed cloud energy estimates with source citations
 - [x] Configurable Ollama model and endpoint
+- [x] Legibility between prompt and response
+- [x] Multiple modes of eco-conscious nudging
 - [ ] Persistent session history
 - [ ] GUI
