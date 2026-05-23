@@ -1,3 +1,6 @@
+# Copyright (C) 2026 b1nku
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 import anthropic
 from router.config import ANTHROPIC_API_KEY, CLAUDE_RESPONSE_MODEL
 

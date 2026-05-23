@@ -1,3 +1,6 @@
+# Copyright (C) 2026 b1nku
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Input, Static
 from textual.binding import Binding
