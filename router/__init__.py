@@ -2,7 +2,7 @@ from router.classifier import classify
 from router import claude_client, ollama_client
 
 
-def route(prompt: str) -> tuple[str, str, str, dict | float | None]:
+def route(prompt: str) -> tuple[str, str, str, dict]:
     """
     Classify and respond to a prompt.
     Returns (route, reason, response, energy_meta).

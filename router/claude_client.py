@@ -45,7 +45,7 @@ _TRAINING_WH_PER_QUERY_HIGH = 0.0005
 _TRAINING_WH_PER_QUERY_MID = (_TRAINING_WH_PER_QUERY_LOW + _TRAINING_WH_PER_QUERY_HIGH) / 2
 
 
-def ask(prompt: str) -> tuple[str, float]:
+def ask(prompt: str) -> tuple[str, dict]:
     """
     Send a prompt to Claude and return the text response plus energy metadata.
     Returns (response, eneergy_meta) where energy_meta contains:
